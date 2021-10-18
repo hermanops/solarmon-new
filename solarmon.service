@@ -7,6 +7,7 @@ ExecStart=/usr/bin/python3 -u solarmon.py
 WorkingDirectory=/home/pi/solarmon
 StandardOutput=inherit
 StandardError=inherit
+WatchdogSec=60
 Restart=always
 User=pi
 
