@@ -33,7 +33,7 @@ print('Setup Serial Connection... ', end='')
 port = settings.get('solarmon', 'port', fallback='/dev/ttyUSB0')
 client = ModbusClient(method='rtu', port=port, baudrate=9600, stopbits=1, parity='N', bytesize=8, timeout=1)
 client.connect()
-print('Dome!')
+print('Done!')
 
 print('Loading inverters... ')
 inverters = []
