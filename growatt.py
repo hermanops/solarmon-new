@@ -116,17 +116,21 @@ class Growatt:
         self.client = client
         self.name = name
         self.unit = unit
+        self.modbusVersion = None
         self.read_info()
 
     def read_info(self):
-        # Modbus version: holding register 73 (one register)
-        row = self.client.read_holding_registers(73, 1, unit=self.unit)
-        if isinstance(row, ModbusIOException):
-            raise row
-        if not hasattr(row, "registers") or not row.registers:
+        """Read modbus version. Non-fatal if inverter is offline (e.g. nighttime)."""
+        try:
+            row = self.client.read_holding_registers(73, 1, unit=self.unit)
+            if _resp_ok(row):
+                self.modbusVersion = row.registers[0]
+            else:
+                self.modbusVersion = None
+                print(f"  [{self.name}] Inverter not responding (offline/sleeping)")
+        except Exception as e:
             self.modbusVersion = None
-        else:
-            self.modbusVersion = row.registers[0]
+            print(f"  [{self.name}] Could not read inverter info: {e}")
 
     def print_info(self):
         print('Growatt:')
@@ -138,7 +142,7 @@ class Growatt:
         """
         Read the main blocks of input registers.
         Each block is read safely; if one fails we still return what we have.
-        Field names/units match your existing pipeline.
+        Returns None if the inverter is not responding.
         """
 
         # ---- Block 0..32 (core live values) ----
