@@ -1,15 +1,27 @@
 [Unit]
-Description=Solarmon
-After=network.target
+Description=Growatt Solar Monitor (Solarmon)
+After=network-online.target
+Wants=network-online.target
+Documentation=https://github.com/ZeroErrors/solarmon
 
 [Service]
+Type=simple
 ExecStart=/usr/bin/python3 -u solarmon.py
 WorkingDirectory=/home/pi/solarmon
-StandardOutput=inherit
-StandardError=inherit
-WatchdogSec=60
+StandardOutput=journal
+StandardError=journal
 Restart=always
+RestartSec=10
 User=pi
+Group=dialout
+
+# Security and resource limits
+Nice=-5
+PrivateTmp=yes
+NoNewPrivileges=true
+
+# Environment
+Environment="PYTHONUNBUFFERED=1"
 
 [Install]
 WantedBy=multi-user.target
