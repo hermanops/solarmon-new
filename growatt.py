@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import time
-import datetime
+import logging
 from pymodbus.exceptions import ModbusIOException
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Codes
@@ -13,7 +15,7 @@ StateCodes = {
     0: 'Waiting',
     1: 'Normal',
     2: 'Discharging',
-    3: 'Fault',
+    3: 'Fault'
 }
 
 ErrorCodes = {
@@ -127,10 +129,10 @@ class Growatt:
                 self.modbusVersion = row.registers[0]
             else:
                 self.modbusVersion = None
-                print(f"  [{self.name}] Inverter not responding (offline/sleeping)")
+                logger.warning("[%s] Inverter not responding (offline/sleeping)", self.name)
         except Exception as e:
             self.modbusVersion = None
-            print(f"  [{self.name}] Could not read inverter info: {e}")
+            logger.warning("[%s] Could not read inverter info: %s", self.name, e)
 
     def print_info(self):
         print('Growatt:')
