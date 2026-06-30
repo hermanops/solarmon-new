@@ -8,7 +8,7 @@ StartLimitBurst=3
 # Sync Python deps before each start so a git pull that changes requirements.txt
 # is applied automatically. '+' runs as root (libs live in system dist-packages
 # while the service runs as User=pi); '-' tolerates failure (e.g. offline boot).
-ExecStartPre=-+/usr/bin/python3 -m pip install --disable-pip-version-check --no-input -r requirements.txt
+ExecStartPre=+/usr/bin/python3 -m pip install --disable-pip-version-check --no-input -r /home/pi/solarmon/requirements.txt
 ExecStart=/usr/bin/python3 -u solarmon.py
 WorkingDirectory=/home/pi/solarmon
 StandardOutput=journal
