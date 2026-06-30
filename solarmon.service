@@ -1,6 +1,8 @@
 [Unit]
 Description=Solarmon
 After=network.target
+StartLimitIntervalSec=10min
+StartLimitBurst=3
 
 [Service]
 # Sync Python deps before each start so a git pull that changes requirements.txt
@@ -11,8 +13,6 @@ ExecStart=/usr/bin/python3 -u solarmon.py
 WorkingDirectory=/home/pi/solarmon
 StandardOutput=inherit
 StandardError=inherit
-StartLimitInterval=1min
-StartLimitBurst=60
 RestartSec=1
 RestartPreventExitStatus=0
 WatchdogSec=60
