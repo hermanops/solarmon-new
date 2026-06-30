@@ -1,27 +1,24 @@
 [Unit]
-Description=Growatt Solar Monitor (Solarmon)
-After=network-online.target
+Description=Solarmon
 Wants=network-online.target
-Documentation=https://github.com/ZeroErrors/solarmon
+After=network-online.target
+StartLimitIntervalSec=10min
+StartLimitBurst=3
 
 [Service]
-Type=simple
+# Sync Python deps before each start so a git pull that changes requirements.txt
+# is applied automatically. '+' runs as root (libs live in system dist-packages
+# while the service runs as User=pi); '-' tolerates failure (e.g. offline boot).
+ExecStartPre=+/usr/bin/python3 -m pip install --disable-pip-version-check --no-input -r /home/pi/solarmon/requirements.txt
 ExecStart=/usr/bin/python3 -u solarmon.py
 WorkingDirectory=/home/pi/solarmon
 StandardOutput=journal
 StandardError=journal
-Restart=always
 RestartSec=10
+RestartPreventExitStatus=0
+WatchdogSec=0
+Restart=always
 User=pi
-Group=dialout
-
-# Security and resource limits
-Nice=-5
-PrivateTmp=yes
-NoNewPrivileges=true
-
-# Environment
-Environment="PYTHONUNBUFFERED=1"
 
 [Install]
 WantedBy=multi-user.target
