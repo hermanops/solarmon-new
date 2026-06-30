@@ -6,6 +6,9 @@ Documentation=https://github.com/ZeroErrors/solarmon
 
 [Service]
 Type=simple
+# Sync Python deps before each start (runs as root via '+', tolerates offline via '-').
+# Keeps the installed libraries in step with requirements.txt after a git pull.
+ExecStartPre=-+/usr/bin/pip3 install -r requirements.txt
 ExecStart=/usr/bin/python3 -u solarmon.py
 WorkingDirectory=/home/pi/solarmon
 StandardOutput=journal
