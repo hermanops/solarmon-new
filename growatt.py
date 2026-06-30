@@ -100,7 +100,7 @@ def _read_input_safe(client, unit, start, count, retries=2, delay=0.05):
     """
     for _ in range(retries + 1):
         try:
-            resp = client.read_input_registers(start, count, unit=unit)
+            resp = client.read_input_registers(start, count=count, slave=unit)
             if _resp_ok(resp):
                 return resp
         except Exception:
@@ -124,7 +124,7 @@ class Growatt:
     def read_info(self):
         """Read modbus version. Non-fatal if inverter is offline (e.g. nighttime)."""
         try:
-            row = self.client.read_holding_registers(73, 1, unit=self.unit)
+            row = self.client.read_holding_registers(73, count=1, slave=self.unit)
             if _resp_ok(row):
                 self.modbusVersion = row.registers[0]
             else:

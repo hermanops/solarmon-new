@@ -6,7 +6,7 @@ import json
 import socket
 
 from configparser import RawConfigParser
-from pymodbus.client.sync import ModbusSerialClient as ModbusClient
+from pymodbus.client import ModbusSerialClient as ModbusClient
 from growatt import Growatt
 
 # --- Optional MQTT (paho-mqtt) ---
@@ -154,7 +154,7 @@ error_interval = settings.getint('query', 'error_interval', fallback=60)
 # Serial connection
 print('Setup Serial Connection... ', end='')
 port = settings.get('solarmon', 'port', fallback='/dev/ttyUSB0')
-client = ModbusClient(method='rtu', port=port, baudrate=9600, stopbits=1, parity='N', bytesize=8, timeout=1)
+client = ModbusClient(port=port, baudrate=9600, stopbits=1, parity='N', bytesize=8, timeout=1)
 client.connect()
 print('Done!')
 
