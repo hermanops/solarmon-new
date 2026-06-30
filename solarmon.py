@@ -31,7 +31,7 @@ def mqtt_setup(cfg):
     base = cfg.get('mqtt', 'base_topic', fallback='solar/inverter').rstrip('/')
 
     client_id = f"solarmon-{socket.gethostname()}"
-    client = mqtt.Client(client_id=client_id, clean_session=True)
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=client_id, clean_session=True)
     if username:
         client.username_pw_set(username, password or None)
 
