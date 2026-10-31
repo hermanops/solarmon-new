@@ -1,0 +1,6 @@
+target-version = "py39"
+line-length = 120
+
+[lint]
+# Errors, pyflakes, warnings only — keep CI about correctness, not style
+select = ["E", "F", "W"]
