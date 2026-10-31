@@ -39,11 +39,21 @@ def mqtt_setup(cfg):
     avail_topic = f"{base}/availability"
     client.will_set(avail_topic, payload="offline", qos=0, retain=True)
 
-    client.connect(host, port, keepalive=30)
-    client.loop_start()
+    def on_connect(c, userdata, flags, reason_code, properties):
+        if reason_code != 0:
+            print(f"MQTT connect failed: {reason_code}")
+            return
+        # (Re)publish on every connect so a broker restart doesn't leave us 'offline'
+        c.publish(avail_topic, "online", qos=0, retain=True)
+        mqtt_publish_discovery(c, cfg)
 
-    # Mark online
-    client.publish(avail_topic, "online", qos=0, retain=True)
+    client.on_connect = on_connect
+    client.reconnect_delay_set(min_delay=1, max_delay=60)
+
+    # Non-blocking: the loop thread connects and retries, so a broker that is
+    # not yet up at boot does not crash the service.
+    client.connect_async(host, port, keepalive=30)
+    client.loop_start()
     return client
 
 
@@ -115,9 +125,12 @@ def mqtt_publish_discovery(client, cfg):
             "payload_not_available": "offline",
             "device": device,
         }
-        if uom:         payload["unit_of_measurement"] = uom
-        if dev_class:   payload["device_class"] = dev_class
-        if state_class: payload["state_class"] = state_class
+        if uom:
+            payload["unit_of_measurement"] = uom
+        if dev_class:
+            payload["device_class"] = dev_class
+        if state_class:
+            payload["state_class"] = state_class
 
         client.publish(cfg_topic, json.dumps(payload), qos=0, retain=True)
 
@@ -155,7 +168,8 @@ error_interval = settings.getint('query', 'error_interval', fallback=60)
 print('Setup Serial Connection... ', end='')
 port = settings.get('solarmon', 'port', fallback='/dev/ttyUSB0')
 client = ModbusClient(port=port, baudrate=9600, stopbits=1, parity='N', bytesize=8, timeout=1)
-client.connect()
+if not client.connect():
+    raise SystemExit(f"Could not open serial port {port}")
 print('Done!')
 
 # MQTT
@@ -168,20 +182,14 @@ for section in settings.sections():
         continue
 
     name = section[10:]
-    unit = int(settings.get(section, 'unit'))
-    measurement = settings.get(section, 'measurement')
+    unit = settings.getint(section, 'unit')
     growatt = Growatt(client, name, unit)
     growatt.print_info()
     inverters.append({
         'name': name,
         'error_sleep': 0,
         'growatt': growatt,
-        'measurement': measurement
     })
-
-# Publish HA discovery once at startup
-if mqtt_client:
-    mqtt_publish_discovery(mqtt_client, settings)
 
 print('Done!')
 

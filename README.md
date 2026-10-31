@@ -6,11 +6,26 @@ A simple Python Script for reading Growatt PV Inverter Modbus RS485 RTU Protocol
 
 How to use
 ----
-- Some hardware running a Linux based OS with Python 3 (eg. Raspberry Pi)
+- Some hardware running a Linux based OS with Python 3.9+ (eg. Raspberry Pi)
 - Connect your Linux based OS to the RS485 port on the inverter via a RS485 to USB cable
 - Copy `solarmon.cfg.example` to `solarmon.cfg` and modify the config values to your setup as needed
 - Run `pip install -r requirements.txt`
-- Run `python solarmon.py` in a screen (or you could setup a service if that is your preference)
+- Run `python3 solarmon.py` in a screen (or you could setup a service if that is your preference)
+
+MQTT / Home Assistant
+----
+Telemetry is published to MQTT only; configure the `[mqtt]` section in `solarmon.cfg`:
+
+| Key | Default | Description |
+|---|---|---|
+| `enable` | `false` | Enable MQTT publishing |
+| `host` / `port` | `127.0.0.1` / `1883` | Broker address |
+| `username` / `password` | – | Broker credentials (optional) |
+| `base_topic` | `solar/inverter` | State topics are `<base_topic>/<sensor>`; availability on `<base_topic>/availability` |
+| `retain` | `true` | Retain state messages |
+| `ha_discovery` | `true` | Publish Home Assistant MQTT discovery configs |
+| `ha_prefix` | `homeassistant` | HA discovery prefix |
+| `device_id` / `device_name` | `solar_inverter` / `Solar Inverter` | HA device identity |
 
 
 Reading from Multiple Units

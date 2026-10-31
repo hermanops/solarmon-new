@@ -8,3 +8,17 @@ port = /dev/ttyUSB0
 
 [inverters.main]
 unit = 1
+
+[mqtt]
+enable = true
+host = 127.0.0.1
+port = 1883
+# username =
+# password =
+base_topic = solar/inverter
+retain = true
+# Home Assistant MQTT discovery
+ha_discovery = true
+ha_prefix = homeassistant
+device_id = solar_inverter
+device_name = Solar Inverter
