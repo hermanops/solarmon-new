@@ -10,3 +10,7 @@ updates:
       - dependencies
     commit-message:
       prefix: chore
+    ignore:
+      # pymodbus >=3.9 requires Python >=3.10; the Pi runs 3.9. Drop this once the Pi is on Debian 12+.
+      - dependency-name: pymodbus
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
